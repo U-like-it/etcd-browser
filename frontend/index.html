@@ -68,6 +68,10 @@
 		    <form ng-submit="submit()">
 		      <div class="input-group" ng-submit="submit()">
 		        <input type="text" class="form-control" ng-model="urlPrefix" placeholder="http://localhost:4001">
+                <select class="form-control" ng-model="etcdNode">
+                    <option ng-repeat="node for node in etcd_nodes" value="{{node.name}}">{{node.base}}</option>
+                </select>
+                <span ng-model="test_values"></span>
 		        <span class="input-group-btn">
 		          <button class="btn btn-default" type="submit">Go!</button>
 		        </span>

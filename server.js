@@ -34,6 +34,8 @@ http.createServer(function serverFile(req, res) {
   console.log(req.url);
   if(req.url === '/'){
     req.url = '/index.html';
+  } else if(req.url == "/nodes") {
+      return response_etcd_nodes(config, res);
   } else if(req.url.split("/")[2] === 'v2') {
     // avoid fileExists for /v2 routes
     return proxy(req, res);
@@ -140,7 +142,7 @@ function load_config(config) {
             }
             item.opts.rejectUnauthorized = item.verify_ssl || false;
 
-        }else if(uri['protocol'] == "http:/"){
+        }else if(uri['protocol'] == "http:"){
             item.opts.requestor = http.request;
         }else{
             throw("Unknow protocol: " + uri.protocol);
@@ -148,6 +150,21 @@ function load_config(config) {
         item.opts.hostname = uri.hostname;
         item.opts.port = uri.port;
     }
-
     return conf;
+}
+
+
+function response_etcd_nodes(config, res){
+    // return configured etcd nodes
+    nodes = etcd_nodes(config);
+    res.writeHead(200, {'Content-Type': 'application/json'})
+    return res.end(JSON.stringify({"nodes": nodes}));
+}
+
+function etcd_nodes(config){
+    nodes = []
+    for (var key in config.instances) {
+        nodes.push({"name": key, "base": config.instances[key].base})
+    }
+    return nodes
 }
