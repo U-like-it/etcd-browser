@@ -175,7 +175,7 @@ app.controller('NodeCtrl', ['$scope','$http','$cookies', function($scope,$http,$
     return dirName;
   }
 
-  $scope.submit();
+  //$scope.submit();
 
   function prepNodes(nodes,parent){
     for(var key in nodes){
