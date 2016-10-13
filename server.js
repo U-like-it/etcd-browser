@@ -69,13 +69,17 @@ function proxy(client_req, client_res) {
     // to a different location, indicates that the node we are
     // querying is not the leader. This will redo the request
     // on the leader which is reported by the Location header
+    console.log(res.statusCode)
     if (res.statusCode === 307) {
         opts.hostname = url.parse(res.headers['location']).hostname;
         client_req.pipe(requester(opts, function(res) {
             console.log('Got response: ' + res.statusCode);
+            client_res.statusCode = res.statusCode;
             res.pipe(client_res, {end: true});
         }, {end: true}));
     } else {
+        console.log("pipe back to host" + res.statusCode);
+        client_res.statusCode = res.statusCode;
         res.pipe(client_res, {end: true});
     }
   }, {end: true}));
