@@ -1,4 +1,3 @@
-
 # etcd browser
 
 ## Demo
@@ -16,7 +15,7 @@
 
     cd <repository>
     sudo docker build -t etcd-browser .
-    sudo docker run --rm --name etcd-browser -p 0.0.0.0:8000:8000 --env ETCD_HOST=10.10.0.1 --env AUTH_PASS=doe -t -i etcd-browser
+    sudo docker run --rm --name etcd-browser -p 0.0.0.0:8000:8000 --env ETCD_BROWSER_CONFIG=/app/config.yaml -v config.yaml:/app/config.yaml -t -i etcd-browser
 
 ### Configuration
 
@@ -30,6 +29,7 @@ instances:
     etcd02:
         verify_ssl: false
         base: https://ssl_host:443/v2/keys/
+        auth: user:password
 ```
 
 by default, configuration file is loaded from ./config.yaml, it can be override
