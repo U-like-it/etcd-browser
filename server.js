@@ -8,10 +8,6 @@ var https = require('https');
 var config = load_config(process.env.ETCD_BROWSER_CONFIG || "./config.yaml");
 var serverPort = process.env.SERVER_PORT || 8000;
 var publicDir = 'frontend';
-var authUser = process.env.AUTH_USER;
-var authPass = process.env.AUTH_PASS;
-
-
 
 var mimeTypes = {
   "html": "text/html",
@@ -24,14 +20,6 @@ var mimeTypes = {
 
 
 http.createServer(function serverFile(req, res) {
-  // authenticaton
-  if(!auth(req, res)) {
-    res.statusCode = 401;
-    res.setHeader('WWW-Authenticate', 'Basic realm="MyRealmName"');
-    res.end('Unauthorized');
-    return;
-  }
-  console.log(req.url);
   if(req.url === '/'){
     req.url = '/index.html';
   } else if(req.url == "/nodes") {
@@ -62,48 +50,26 @@ function proxy(client_req, client_res) {
       return client_res.end("Can not find this etcd host\n");
   }
   
-
+  console.log(opts);
   console.log("proxy to: " + opts.hostname + ":"  + opts.port + opts.path);
   client_req.pipe(opts.requestor(opts, function(res) {
     // if etcd returns that the requested  page  has been moved
     // to a different location, indicates that the node we are
     // querying is not the leader. This will redo the request
     // on the leader which is reported by the Location header
-    console.log(res.statusCode)
     if (res.statusCode === 307) {
         opts.hostname = url.parse(res.headers['location']).hostname;
         client_req.pipe(requester(opts, function(res) {
-            console.log('Got response: ' + res.statusCode);
             client_res.statusCode = res.statusCode;
             res.pipe(client_res, {end: true});
         }, {end: true}));
     } else {
-        console.log("pipe back to host" + res.statusCode);
         client_res.statusCode = res.statusCode;
         res.pipe(client_res, {end: true});
     }
   }, {end: true}));
 }
 
-
-function auth(req, res) {
-  if(!authUser) return true;
-
-  var auth = req.headers.authorization;
-  if(!auth) return false;
-
-  // malformed
-  var parts = auth.split(' ');
-  if('basic' != parts[0].toLowerCase()) return false;
-  if(!parts[1]) return false;
-  auth = parts[1];
-
-  // credentials
-  auth = new Buffer(auth, 'base64').toString();
-  auth = auth.match(/^([^:]*):(.*)$/);
-  if(!auth) return false;
-  return (auth[1] === authUser && auth[2] === authPass)
-}
 
 function getServerInfo(client_req, config){
     var path = client_req.url;
@@ -153,6 +119,9 @@ function load_config(config) {
         }
         item.opts.hostname = uri.hostname;
         item.opts.port = uri.port;
+        if(item.auth){
+            item.opts.auth = item.auth;
+        }
     }
     return conf;
 }
