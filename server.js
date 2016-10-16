@@ -6,7 +6,7 @@ var http = require('http');
 var https = require('https');
 
 var config = load_config(process.env.ETCD_BROWSER_CONFIG || "./config.yaml");
-var serverPort = process.env.SERVER_PORT || 8000;
+var serverPort = config["listen"];
 var publicDir = 'frontend';
 
 var mimeTypes = {
@@ -39,8 +39,8 @@ http.createServer(function serverFile(req, res) {
     res.writeHead(200, mimeTypes[path.extname(filename).split(".")[1]]);
     fs.createReadStream(filename).pipe(res);
   });
-}).listen(config['listen'], function() {
-  console.log('etc-browser listening on port ' + config['listen']);
+}).listen(serverPort, function() {
+  console.log('etc-browser listening on port ' + serverPort)
 });
 
 function proxy(client_req, client_res) {
