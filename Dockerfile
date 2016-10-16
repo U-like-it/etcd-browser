@@ -5,8 +5,8 @@ MAINTAINER https://github.com/woosley/etcd-browser
 
 RUN apt-get update
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get install -y nodejs
-
+RUN apt-get install -y nodejs npm
+RUN npm install yamljs
 RUN mkdir /app
 ADD . /app/
 
