@@ -11,11 +11,15 @@
 
 ## To build/run as a Docker container:
 
-(adjust options as necessary - to run it as a daemon, remove "--rm", "-t", "-i" and add "-D")
+    docker run --rm --name etcd-browser -p 0.0.0.0:8080:8080 --env ETCD_BROWSER_CONFIG=/app/config.yaml -v config.yaml:/app/config.yaml woosley/etcd-browser
 
-    cd <repository>
-    sudo docker build -t etcd-browser .
-    sudo docker run --rm --name etcd-browser -p 0.0.0.0:8000:8000 --env ETCD_BROWSER_CONFIG=/app/config.yaml -v config.yaml:/app/config.yaml -t -i etcd-browser
+## Using docker-compose
+
+Startup a demo of etcd&etcd-browser locally by running
+
+```
+docker-compose up
+```
 
 ### Configuration
 

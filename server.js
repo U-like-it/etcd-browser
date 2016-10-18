@@ -50,7 +50,6 @@ function proxy(client_req, client_res) {
       return client_res.end("Can not find this etcd host\n");
   }
   
-  console.log(opts);
   console.log("proxy to: " + opts.hostname + ":"  + opts.port + opts.path);
   client_req.pipe(opts.requestor(opts, function(res) {
     // if etcd returns that the requested  page  has been moved
