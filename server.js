@@ -44,12 +44,17 @@ http.createServer(function serverFile(req, res) {
 });
 
 function proxy(client_req, client_res) {
+  var ip = client_req.headers['x-forwarded-for'] || 
+           client_req.connection.remoteAddress || 
+           client_req.socket.remoteAddress ||
+           client_req.connection.socket.remoteAddress;
   var opts = getServerInfo(client_req, config);
   if(!opts) {
       client_res.writeHead(404, {'Content-Type': 'text/plain'})
       return client_res.end("Can not find this etcd host\n");
   }
-  
+  var time = new Date().toISOString(); 
+  console.log(time + " " + ip + " --- " + opts.method + " " + client_req.url)
   console.log("proxy to: " + opts.hostname + ":"  + opts.port + opts.path);
   client_req.pipe(opts.requestor(opts, function(res) {
     // if etcd returns that the requested  page  has been moved
